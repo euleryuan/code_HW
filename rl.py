@@ -34,19 +34,26 @@ def vision_reasoner_accuracy_reward(predict_str: str, ground_truth: str) -> floa
     accuracy_reward = 0.0
     try:
         gt = json.loads(ground_truth)
-        answer_type = gt.get("answer_type", "").lower()
+        answer_type_gt = gt.get("answer_type", "").lower()
         answer = gt.get("answer")
+
         # 抽取 <answer>…</answer> JSON
         json_match = re.search(r'<answer>\s*(.*?)\s*</answer>', predict_str, re.DOTALL)
         if not json_match:
             return 0.0
+
         data = json.loads(json_match.group(1))
         if not isinstance(data, list) or len(data) == 0:
             return 0.0
         obj = data[0]
 
-        # ---------- single ----------
-        if answer_type == "single":
+        # --------- 🔍 Step 1: check model's answer_type match ---------
+        model_answer_type = obj.get("answer_type", "").lower()
+        if model_answer_type != answer_type_gt:
+            return 0.0  # ❌ answer_type 不一致，直接 0 分
+
+        # --------- Step 2: proceed only if answer_type matches ---------
+        if answer_type_gt == "single":
             y = 1 if str(answer).lower() == "yes" else 0
             pred = str(obj.get("answer", "")).lower()
             p = obj.get("confidence", None)
@@ -55,8 +62,7 @@ def vision_reasoner_accuracy_reward(predict_str: str, ground_truth: str) -> floa
             accuracy_reward = 1.0 - 2.0 * abs(float(p) - y)
             accuracy_reward *= reward_weight["single"]
 
-        # ---------- multi ----------
-        elif answer_type == "multi":
+        elif answer_type_gt == "multi":
             gold = set([s.lower() for s in answer])
             pred = set([s.lower() for s in obj.get("answer", [])])
             tp = len(gold & pred)
@@ -73,8 +79,7 @@ def vision_reasoner_accuracy_reward(predict_str: str, ground_truth: str) -> floa
                 accuracy_reward = 0.5 * f_beta + 0.5 * jaccard
             accuracy_reward *= reward_weight["multi"]
 
-        # ---------- quality_score ----------
-        elif answer_type == "quality_score":
+        elif answer_type_gt == "quality_score":
             try:
                 s = float(answer)
                 shat = float(obj.get("answer", 0))
@@ -84,19 +89,15 @@ def vision_reasoner_accuracy_reward(predict_str: str, ground_truth: str) -> floa
                 accuracy_reward = 0.0
             accuracy_reward *= reward_weight["quality_score"]
 
-        # ---------- ads / aes 分类任务 ----------
-        elif answer_type in ["ads", "aes"]:
+        elif answer_type_gt in ["ads", "aes"]:
             pred = str(obj.get("answer", "")).capitalize()
             truth = str(answer).capitalize()
-            if answer_type == "aes":
-                class_weights = aes_weights
-            else:
-                class_weights = ads_weights
+            class_weights = aes_weights if answer_type_gt == "aes" else ads_weights
             if pred == truth:
                 accuracy_reward = class_weights.get(truth, 0.0)
             else:
                 accuracy_reward = 0.0
-            accuracy_reward *= reward_weight[answer_type]
+            accuracy_reward *= reward_weight[answer_type_gt]
 
     except Exception:
         pass
