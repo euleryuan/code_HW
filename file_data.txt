@@ -1,0 +1,59 @@
+📊 总 AES 评分统计:
+{'Fair': 191008, 'Poor': 41786, 'Good': 7579, 'Bad': 2859, 'Excellent': 2925}
+
+📊 总 ADS 评分统计:
+{'Fair': 199086, 'Poor': 29970, 'Bad': 9316, 'Good': 7774, 'Excellent': 11}
+
+原始数据集：    "000045f18651568e21c0c96b67e41435ba78110594c2eddeb41a2e9a6f64ef04.png": {
+        "Aesthetic_scoring": [
+            "Fair",
+            "Fair",
+            "Fair",
+            "Fair",
+            "Fair"
+        ],
+        "Ad_attribute": [
+            "Good",
+            "Good",
+            "Good",
+            "Fair",
+            "Good"
+        ],
+        "aes_ordered_list": [
+            "Fair",
+            "Fair",
+            "Fair"
+        ],
+        "ads_ordered_list": [
+            "Good",
+            "Good",
+            "Good"
+        ],
+        "aes_res_drop": "Fair",
+        "ads_res_drop": "Good",
+        "aes_score": "Fair",
+        "ads_score": "Good",
+        "file_path": "D:\\01 work\\04 data\\01.质量分数据\\素材主观美学\\0322-round3\\000045f18651568e21c0c96b67e41435ba78110594c2eddeb41a2e9a6f64ef04.png"
+    },处理后：    "items": [
+        {
+            "id": 119000,
+            "image_id": "000045f18651568e21c0c96b67e41435ba78110594c2eddeb41a2e9a6f64ef04.png",
+            "aes_score": "Fair",
+            "ads_score": "Good",
+            "file_path": "/home/wsw/data/aesthetics/label_data/0322-round3/000045f18651568e21c0c96b67e41435ba78110594c2eddeb41a2e9a6f64ef04.png",
+            "Aesthetic_scoring": [
+                "Fair",
+                "Fair",
+                "Fair",
+                "Fair",
+                "Fair"
+            ],
+            "Ad_attribute": [
+                "Good",
+                "Good",
+                "Good",
+                "Fair",
+                "Good"
+            ]
+        },
+        {
